@@ -5,12 +5,22 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.PriorityQueue;
+
 public class MainActivity extends AppCompatActivity {
+    // Explicit ประกาศตัวแปร
+    private UserTABLE objUserTALE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Create & Connected Database
+        createConnected(); // เรียกใช้ Method ย่อย
+    } // onCreate
+
+    private void createConnected() {
+        objUserTALE = new UserTABLE(this);
     }
 
     @Override
