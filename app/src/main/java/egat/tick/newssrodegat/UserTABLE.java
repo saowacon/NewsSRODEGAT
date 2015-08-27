@@ -1,5 +1,6 @@
 package egat.tick.newssrodegat;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -11,11 +12,26 @@ public class UserTABLE {
     private MyOpenHelper objMyOpenHelper;
     private SQLiteDatabase writeSqLiteDatabase, readSqLiteDatabase; // W & R DB
 
+    // สร้างตัวแปรที่เป็น Static และไม่สามารถแก้ไขได้ด้วย Method ใดๆ (Final) กำหนดชื่อตารางให้ตัวแปรเหมือนกับใน MyOpenHelper
+    public static final String USER_TABLE = "userTABLE";
+    public static final String COLUMN_ID_USER = "_id";
+    public static final String COLUMN_USER = "User";
+    public static final String COLUMN_PASSWORD = "Password";
+    public static final String COLUMN_NAME = "Name";
+
+
     public UserTABLE(Context context) {
         objMyOpenHelper = new MyOpenHelper(context); // ต่อท่อ Data
         writeSqLiteDatabase = objMyOpenHelper.getWritableDatabase();
         readSqLiteDatabase = objMyOpenHelper.getReadableDatabase();
-
     } // Constructor
+
+    public long addNewUser(String strUser, String strPassword, String strName) {
+        ContentValues objContentValues = new ContentValues();
+        objContentValues.put(COLUMN_USER, strUser);
+        objContentValues.put(COLUMN_PASSWORD, strPassword);
+        objContentValues.put(COLUMN_NAME, strName);
+        return writeSqLiteDatabase.insert(USER_TABLE, null, objContentValues);
+    } // Add New User
 
 } // Main Class

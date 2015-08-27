@@ -1,5 +1,6 @@
 package egat.tick.newssrodegat;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,7 +10,8 @@ import java.util.PriorityQueue;
 
 public class MainActivity extends AppCompatActivity {
     // Explicit ประกาศตัวแปร
-    private UserTABLE objUserTALE;
+    private UserTABLE objUserTABLE;
+    private NewsTABLE objNewsTABLE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,10 +19,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //Create & Connected Database
         createConnected(); // เรียกใช้ Method ย่อย
+
+        //Tester Add New Value
+        //testerAddValue();
+
+        //Delete All Data เขียนความว่างเปล่าไปในตาราง
+        deleteAllData();
+
     } // onCreate
 
+    private void deleteAllData() {
+        SQLiteDatabase objSqLiteDatabase = openOrCreateDatabase("srod.db", MODE_PRIVATE, null);
+        objSqLiteDatabase.delete("userTABLE", null, null);
+        objSqLiteDatabase.delete("newsTABLE", null, null);
+    } // Delete All Data MODE_PRIVATE คือ ห้าม Drop Table ทิ้ง
+
+    private void testerAddValue() {
+        objUserTABLE.addNewUser("testUser", "tesPassword", "ทดสอบชื่อ");
+        objNewsTABLE.addNews("27Aug2015", "testHead", "testDetail", "http//image", "EGAT");
+    }
+
     private void createConnected() {
-        objUserTALE = new UserTABLE(this);
+        objUserTABLE = new UserTABLE(this);
+        objNewsTABLE = new NewsTABLE(this);
     }
 
     @Override
