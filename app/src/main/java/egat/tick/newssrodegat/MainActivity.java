@@ -2,6 +2,7 @@ package egat.tick.newssrodegat;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -88,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
             //Check Password
             if (passwordString.equals(strMyResult[2])) {
 
-                //Intent to ListNews กรณี User & Password ถูก
-
+                //Intent to ListNews กรณี User & Password ถูก ไปเรียกใช้อีกไฟล์
+                startActivity(new Intent(this, HeadListView.class));
             } else {
                 errorDialog("Password False", "Please Try Again Password False");
             } // กรณี User ถูก Password ผิด

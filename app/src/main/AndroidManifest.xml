@@ -24,6 +24,10 @@
             android:name=".HeadListView"
             android:label="@string/title_activity_head_list_view" >
         </activity>
+        <activity
+            android:name=".DetailActivity"
+            android:label="@string/title_activity_detail" >
+        </activity>
     </application>
 
 </manifest>
