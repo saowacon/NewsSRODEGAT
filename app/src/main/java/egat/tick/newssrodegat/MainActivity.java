@@ -1,11 +1,24 @@
 package egat.tick.newssrodegat;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.PriorityQueue;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +39,89 @@ public class MainActivity extends AppCompatActivity {
         //Delete All Data เขียนความว่างเปล่าไปในตาราง
         deleteAllData();
 
+        //Synchronize JSON to SQLite
+        synJSONtoSQLite(); // ปรับ Protocol ให้เข้าถึง http https ftp ได้ โดยไม่ต้องกลัวไวรัส
+
     } // onCreate
+
+    private void synJSONtoSQLite() {
+
+        //Change Policy
+        StrictMode.ThreadPolicy myPolicy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(myPolicy);
+
+        int intTimes = 0;
+        while (intTimes <= 1) { // 2 ตาราง intTimes = 0 กับ 1
+
+            //1. Create InputStream
+            InputStream objInputStream = null;
+            String strJSON = null;
+            String userURL = "http://swiftcodingthai.com/egat/php_get_data_tick.php"; // ตำแหน่งที่ Smartphone Connect กับไฟล์ PHP
+            String newsURL = "http://swiftcodingthai.com/egat/php_get_data_news.php";
+            HttpPost objHttpPost;
+
+            try {
+                HttpClient objHttpClient = new DefaultHttpClient();
+                if (intTimes != 1) { // ใช้ Switch Case แทน ถ้ามากกว่า 2 รอบ
+                    objHttpPost = new HttpPost(userURL);
+                } else {
+                    objHttpPost = new HttpPost(newsURL);
+                }
+                HttpResponse objHttpResponse = objHttpClient.execute(objHttpPost);
+                HttpEntity objHttpEntity = objHttpResponse.getEntity();
+                objInputStream = objHttpEntity.getContent();
+
+            } catch (Exception e) {
+                Log.d("egat", "InputStream ==> " + e.toString());
+            }
+
+            //2. Create JSON --> String
+            try {
+                BufferedReader objBuffereader = new BufferedReader(new InputStreamReader(objInputStream, "UTF-8"));
+                StringBuilder objStringBuilder = new StringBuilder(); //StringBuilder เป็นตัวต่อ String จากที่ตัดไว้เป็นท่อนๆ (strLine)
+                String strLine = null;
+                while ((strLine = objBuffereader.readLine())!= null  ) {
+                    objStringBuilder.append(strLine);
+                } //while
+                objInputStream.close();
+                strJSON = objStringBuilder.toString();
+
+            } catch (Exception e) {
+                Log.d("egat", "strJson ==> " + e.toString());
+            }
+
+            //3. Create SQLite --> Change String to Data
+            try {
+                final JSONArray objJsonArray = new JSONArray(strJSON);
+
+                for (int i = 0; i < objJsonArray.length(); i++) {
+                    JSONObject jsonObject = objJsonArray.getJSONObject(i);
+                    if (intTimes != 1) {
+                        //For User Table
+                        String strUser = jsonObject.getString("User");
+                        String strPassword = jsonObject.getString("Password");
+                        String strName = jsonObject.getString("Name");
+                        objUserTABLE.addNewUser(strUser, strPassword, strName);
+
+                    } else {
+                        //For News Table
+                        String strDate = jsonObject.getString("Date");
+                        String strHead = jsonObject.getString("Head");
+                        String strDetail = jsonObject.getString("Detail");
+                        String strImage = jsonObject.getString("Image");
+                        String strOwner = jsonObject.getString("Owner");
+                        objNewsTABLE.addNews(strDate, strHead, strDetail, strImage, strOwner);
+                    }
+                } // วน Loop For ตามจำนวน record ใน Table
+
+            } catch (Exception e) {
+                Log.d("egat", "Update ==> " + e.toString());
+            }
+
+            intTimes += 1;
+        } // while
+
+    } //synJSONtoSQLite
 
     private void deleteAllData() {
         SQLiteDatabase objSqLiteDatabase = openOrCreateDatabase("srod.db", MODE_PRIVATE, null);
