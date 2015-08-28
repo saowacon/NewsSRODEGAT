@@ -20,7 +20,7 @@
         <EditText
             android:layout_width="@dimen/image"
             android:layout_height="wrap_content"
-            android:id="@+id/editText"
+            android:id="@+id/edtUser"
             android:layout_gravity="center_horizontal"
             android:hint="User : "
             android:textColor="@color/text" />
@@ -28,7 +28,7 @@
         <EditText
             android:layout_width="@dimen/image"
             android:layout_height="wrap_content"
-            android:id="@+id/editText2"
+            android:id="@+id/edtPassword"
             android:layout_gravity="center_horizontal"
             android:hint="Password : "
             android:inputType="textPassword"
@@ -39,7 +39,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button"
+        android:text="Login"
+        android:id="@+id/btnLogin"
         android:layout_alignParentBottom="true" />
 </RelativeLayout>

@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="egat.tick.newssrodegat" >
 
-    <uses-permission android:name="android.permission.INTERNET"> // อนุญาตให้มือถือต่อ Net ได้
-
+    <uses-permission android:name="android.permission.INTERNET" >
+ // อนุญาตให้มือถือต่อ Net ได้
     </uses-permission>
 
     <application
@@ -19,6 +19,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".HeadListView"
+            android:label="@string/title_activity_head_list_view" >
         </activity>
     </application>
 

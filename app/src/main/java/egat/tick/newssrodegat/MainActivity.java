@@ -1,5 +1,7 @@
 package egat.tick.newssrodegat;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,11 +30,18 @@ public class MainActivity extends AppCompatActivity {
     // Explicit ประกาศตัวแปร
     private UserTABLE objUserTABLE;
     private NewsTABLE objNewsTABLE;
+    private EditText userEditText, passwordEditText;
+    private Button loginButton;
+    private String userString, passwordString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Bind Widget
+        bindWidget();
+
         //Create & Connected Database
         createConnected(); // เรียกใช้ Method ย่อย
 
@@ -42,7 +54,71 @@ public class MainActivity extends AppCompatActivity {
         //Synchronize JSON to SQLite
         synJSONtoSQLite(); // ปรับ Protocol ให้เข้าถึง http https ftp ได้ โดยไม่ต้องกลัวไวรัส
 
+        //Button Controller
+        buttonController();
+
     } // onCreate
+
+    private void buttonController() {
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                userString = userEditText.getText().toString().trim();
+                passwordString = passwordEditText.getText().toString().trim();
+
+                //Check Zero
+                if (userString.equals("")  || passwordString.equals("")) {  // || = or
+                    //Have Space
+                    errorDialog("Have Space", "Please Fill All Blank");
+                } else {
+                    //No Space
+                    // Check กรณีกรอกครบทั้ง User และ Password
+                    checkUser();
+                } // if
+            } //event
+        });
+
+    } // buttonController จัดการปุ่ม Login
+
+    private void checkUser() {
+        //ใช้เครื่องมือในการทำ Search Engine
+        try { // หา User เจอใน Table
+            String strMyResult[] = objUserTABLE.searchUser(userString);
+
+            //Check Password
+            if (passwordString.equals(strMyResult[2])) {
+
+                //Intent to ListNews กรณี User & Password ถูก
+
+            } else {
+                errorDialog("Password False", "Please Try Again Password False");
+            } // กรณี User ถูก Password ผิด
+        } catch (Exception e) {
+            errorDialog("ไม่มี User", "ไม่มี User " + userString + " ในฐานข้อมูลของเรา");
+        } // กรณี User ผิด
+    } //checkUser
+
+    private void errorDialog(String strTitle, String strMessage) { //Method นี้ คนอื่นใช้ได้ด้วย  ใน Argument มีค่า 2 ค่า
+        AlertDialog.Builder objBuilder = new AlertDialog.Builder(this); //สร้าง Popup
+        objBuilder.setIcon(R.drawable.danger);
+        objBuilder.setTitle(strTitle);
+        objBuilder.setMessage(strMessage);
+        objBuilder.setCancelable(false); // สั่งให้ไม่สามารถกดปุ่ม Undo บนมือถือได้
+        objBuilder.setPositiveButton("ตกลง", new DialogInterface.OnClickListener() { //เมื่อไรกดปุ่ม ตกลง ให้ทำ OnclickListener
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            } // Event
+        });
+        objBuilder.show();
+
+    } // errorDialog
+
+    private void bindWidget() {
+        userEditText = (EditText) findViewById(R.id.edtUser); //ผูกตัวแปรกับสิ่งที่อยู่บน ui
+        passwordEditText = (EditText) findViewById(R.id.edtPassword);
+        loginButton = (Button) findViewById(R.id.btnLogin);
+    } // Bind Widget
 
     private void synJSONtoSQLite() {
 
